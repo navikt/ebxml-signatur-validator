@@ -40,7 +40,7 @@ public class DokumentValidator {
 	
     }
     
-    public void validateEbxmlSignature(byte [] rawMessage) throws Exception {
+    public boolean validateEbxmlSignature(byte [] rawMessage) throws Exception {
 	ByteArrayInputStream in = new ByteArrayInputStream(rawMessage);
 	MimeMessage mimeMessage = new MimeMessage(session, in);
 	if (! (mimeMessage.getContent() instanceof MimeMultipart)) {
@@ -70,16 +70,16 @@ public class DokumentValidator {
 	}
 	
 	signature.addResourceResolver(new EbmsAttachmentResolver(List.of(new Attachment(contentId, contentType, payload.getInputStream().readAllBytes()))));
-	signature.checkSignatureValue(signature.getKeyInfo().getX509Certificate());
+	return signature.checkSignatureValue(signature.getKeyInfo().getX509Certificate());
 	
     }
     
-    public void validatePayloadSignature(byte [] rawMessage) throws Exception {
+    public boolean validatePayloadSignature(byte [] rawMessage) throws Exception {
 	var db = dbf.newDocumentBuilder();
 	Document document = db.parse(new ByteArrayInputStream(rawMessage));
 	var nodeList = document.getElementsByTagNameNS(Constants.SignatureSpecNS, Constants._TAG_SIGNATURE);
 	XMLSignature signature = new XMLSignature((Element)nodeList.item(0),Constants.SignatureSpecNS);
-	signature.checkSignatureValue(signature.getKeyInfo().getX509Certificate());
+	return signature.checkSignatureValue(signature.getKeyInfo().getX509Certificate());
     }
     
     private void validateEbxmlSignature(XMLSignature signature,byte []attachment) throws Exception {
