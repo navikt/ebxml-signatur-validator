@@ -57,7 +57,7 @@ public class DokumentValidator {
 	
 	XMLSignature signature = new XMLSignature((Element)nodeList.item(0),Constants.SignatureSpecNS);
 	
-	validateEbxmlSignature(signature, payload.getInputStream().readAllBytes());
+	logger.info(signature.getKeyInfo().getX509Certificate().getSerialNumber().toString(16));
 	
 	var contentId = payload.getHeader("Content-Id") == null || payload.getHeader("Content-Id").length == 0  ? null : payload.getHeader("Content-Id")[0] ;
 	var contentType = payload.getHeader("Content-Type") == null || payload.getHeader("Content-Type").length == 0  ? null : payload.getHeader("Content-Type")[0];
@@ -81,15 +81,6 @@ public class DokumentValidator {
 	XMLSignature signature = new XMLSignature((Element)nodeList.item(0),Constants.SignatureSpecNS);
 	return signature.checkSignatureValue(signature.getKeyInfo().getX509Certificate());
     }
-    
-    private void validateEbxmlSignature(XMLSignature signature,byte []attachment) throws Exception {
-	var certificateFromSignature = signature.getKeyInfo().getX509Certificate();
-	
-	System.out.println(certificateFromSignature.getSerialNumber().toString(16));
-	
-
-    }
-    
     
     private Session mockSession() {
         var properties = new Properties();
